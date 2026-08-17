@@ -12,6 +12,7 @@ using Pcf.ReceivingFromPartner.DataAccess;
 using Pcf.ReceivingFromPartner.DataAccess.Repositories;
 using Pcf.ReceivingFromPartner.DataAccess.Data;
 using Pcf.ReceivingFromPartner.Integration;
+using MassTransit;
 
 namespace Pcf.ReceivingFromPartner.WebHost
 {
@@ -34,14 +35,14 @@ namespace Pcf.ReceivingFromPartner.WebHost
             services.AddScoped<INotificationGateway, NotificationGateway>();
             services.AddScoped<IDbInitializer, EfDbInitializer>();
 
-            services.AddHttpClient<IGivingPromoCodeToCustomerGateway, GivingPromoCodeToCustomerGateway>(c =>
+            services.AddMassTransit(x =>
             {
-                c.BaseAddress = new Uri(Configuration["IntegrationSettings:GivingToCustomerApiUrl"]);
-            });
-
-            services.AddHttpClient<IAdministrationGateway, AdministrationGateway>(c =>
-            {
-                c.BaseAddress = new Uri(Configuration["IntegrationSettings:AdministrationApiUrl"]);
+                x.UsingRabbitMq((context, cfg) => cfg.Host(
+                    Configuration["RabbitMq:Host"], "/", h =>
+                    {
+                        h.Username(Configuration["RabbitMq:Username"]);
+                        h.Password(Configuration["RabbitMq:Password"]);
+                    }));
             });
 
             services.AddDbContext<DataContext>(x =>
