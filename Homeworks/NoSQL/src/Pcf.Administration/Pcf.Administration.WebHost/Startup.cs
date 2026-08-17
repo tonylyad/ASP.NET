@@ -6,7 +6,6 @@ using Castle.Core.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -34,15 +33,11 @@ namespace Pcf.Administration.WebHost
         {
             services.AddControllers().AddMvcOptions(x=> 
                 x.SuppressAsyncSuffixInActionNames = false);
-            services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
-            services.AddScoped<IDbInitializer, EfDbInitializer>();
-            services.AddDbContext<DataContext>(x =>
-            {
-                //x.UseSqlite("Filename=PromocodeFactoryAdministrationDb.sqlite");
-                x.UseNpgsql(Configuration.GetConnectionString("PromocodeFactoryAdministrationDb"));
-                x.UseSnakeCaseNamingConvention();
-                x.UseLazyLoadingProxies();
-            });
+            services.AddSingleton(new MongoDbContext(
+                Configuration.GetConnectionString("PromocodeFactoryAdministrationDb"),
+                Configuration["MongoDb:DatabaseName"]));
+            services.AddScoped(typeof(IRepository<>), typeof(MongoRepository<>));
+            services.AddScoped<IDbInitializer, MongoDbInitializer>();
 
             services.AddOpenApiDocument(options =>
             {
