@@ -63,7 +63,7 @@ namespace Pcf.Administration.WebHost.Controllers
                 Email = employee.Email,
                 Role = new RoleItemResponse()
                 {
-                    Id = employee.Id,
+                    Id = employee.Role.Id,
                     Name = employee.Role.Name,
                     Description = employee.Role.Description
                 },
