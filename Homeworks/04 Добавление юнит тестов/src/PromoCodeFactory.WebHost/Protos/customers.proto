@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+option csharp_namespace = "PromoCodeFactory.WebHost.Grpc.Contracts";
+
+package customers;
+
+service CustomersApi {
+  rpc GetAll (GetAllCustomersRequest) returns (CustomersReply);
+  rpc GetById (CustomerByIdRequest) returns (CustomerReply);
+  rpc Create (SaveCustomerRequest) returns (CustomerReply);
+  rpc Update (UpdateCustomerRequest) returns (CustomerReply);
+  rpc Delete (CustomerByIdRequest) returns (DeleteCustomerReply);
+}
+
+message GetAllCustomersRequest {}
+
+message CustomerByIdRequest {
+  string id = 1;
+}
+
+message SaveCustomerRequest {
+  string first_name = 1;
+  string last_name = 2;
+  string email = 3;
+  repeated string preference_ids = 4;
+}
+
+message UpdateCustomerRequest {
+  string id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string email = 4;
+  repeated string preference_ids = 5;
+}
+
+message PreferenceReply {
+  string id = 1;
+  string name = 2;
+}
+
+message CustomerReply {
+  string id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string email = 4;
+  repeated PreferenceReply preferences = 5;
+}
+
+message CustomersReply {
+  repeated CustomerReply customers = 1;
+}
+
+message DeleteCustomerReply {
+  bool deleted = 1;
+}
